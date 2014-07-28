@@ -8,5 +8,6 @@
 </head>
 <body>
 	<h1>This is result 1 page.</h1>
+	<h4>Changed on MAC.</h4>
 </body>
 </html>

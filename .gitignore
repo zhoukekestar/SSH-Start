@@ -7,6 +7,10 @@
 *.jar
 *.war
 *.ear
+#target file#
+mySSH-V2/target/*
+target/*
+
 
 # target files #
 mySSH-V2/target/*
