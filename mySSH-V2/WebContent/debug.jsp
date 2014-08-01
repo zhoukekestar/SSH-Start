@@ -7,7 +7,7 @@
 
 </head>
 <body>
-	<h1>Debug.jsp API</h1>
+	<h1>Debug.jsp API.</h1>
 	<h2>actions</h2>
 	<ul>
 		<li><a href="${base}actions/login.action?name=res_1">/actions/login.action?name=res_1</a></li>
