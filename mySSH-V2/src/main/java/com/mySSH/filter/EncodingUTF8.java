@@ -36,7 +36,22 @@ public class EncodingUTF8 implements Filter {
 		 * port="8080" 
 		 * protocol="HTTP/1.1" 
 		 * redirectPort="8443"/>
-		 * */		
+		 * */	
+		/*
+		 * Change the tomcat's server.xml file.
+		 * You should change the node marked as follows:
+		 * <Connector>
+		 * 
+		 * Add the attribute to "<Connector> node":
+		 * useBodyEncodingForURI="true" 
+		 * URIEncoding="UTF-8" 			
+		 * 
+		 * 
+		 * 
+		 * All configuration like as follows:
+		 * <Connector connectionTimeout="20000" useBodyEncodingForURI="true" URIEncoding="UTF-8"  port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
+		 * 
+		 * */
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html;charset=utf-8");
 		System.out.println("UTF-8 ok!");
