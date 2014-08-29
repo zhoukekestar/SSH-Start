@@ -16,7 +16,7 @@
   </filter>
   <filter-mapping>
     <filter-name>struts2</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/struts2/*</url-pattern>
   </filter-mapping>
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
