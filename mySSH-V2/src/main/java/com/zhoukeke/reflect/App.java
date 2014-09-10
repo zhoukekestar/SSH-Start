@@ -2,7 +2,7 @@ package com.zhoukeke.reflect;
 
 import java.io.*;
 import java.util.*;
- 
+
 class Factory{
     public static Fruit getInstance(String ClassName){
         Fruit f=null;
