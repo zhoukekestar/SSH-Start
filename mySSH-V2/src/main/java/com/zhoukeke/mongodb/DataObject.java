@@ -2,8 +2,7 @@ package com.zhoukeke.mongodb;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
-import com.zhoukeke.util.HttpReq;
+import com.toomao.wx.utils.HttpRequest;
 
 public class DataObject {
 	public static final String urlAngel = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssi_ssfx_flzjtj?daima=sh600050";
@@ -11,7 +10,7 @@ public class DataObject {
 	{
 		DBObject document = new BasicDBObject();
 		
-		String temp = HttpReq.Get(urlAngel);
+		String temp = HttpRequest.get(urlAngel).body();// HttpReq.Get(urlAngel);
 		//System.out.println(temp);
 		temp = temp.substring(temp.indexOf("{") + 1, temp.indexOf("}"));
 

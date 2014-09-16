@@ -15,11 +15,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;  
   
 /** 
- * ��ϢժҪ��һ���㷨������ԭʼ��ݶ೤����ϢժҪ�Ľ���ǹ̶����ȵģ���һ�ֲ�������㷨 
- * ԭʼ�������bitλ�ı仯�����ᵼ����ϢժҪ�Ľ���кܴ�Ĳ�ͬ���Ҹ�ݽ�������ԭʼ��ݵĸ��ʼ��͡� 
- * ��ϢժҪ���Կ���ԭʼ��ݵ�ָ�ƣ�ָ�Ʋ�ͬ��ԭʼ��ݲ�ͬ�� 
  *  
- * SHA secure hash algorithm ��ȫ��ϣ�㷨 
+ * SHA secure hash algorithm 
  * @author stone 
  * @date 2014-03-11 18:21:16 
  */  
@@ -27,35 +24,29 @@ public class SHA {
       
       
     public static void main(String[] args) throws Exception {  
-        encodeByMAC("�й�oP����&*������&802134��");  
+        encodeByMAC("This is mysha");  
           
-        encodeBySHA("�й�oP����&*������&802134��");  
+        encodeBySHA("this is mysha");  
           
-        shaFile();  
+        shaFile("abc.txt");  
     }  
       
     /** 
-     * ʹ��MAC �㷨�� ��ϢժҪ 
+     * 
      * @param data 
      * @throws Exception 
      */  
     public static void encodeByMAC(String data) throws Exception{  
 //      KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA1");  
-//      SecretKey key = keyGen.generateKey(); //���ÿ����ɵ�key��һ��, �˴�����ʹ��  
+//      SecretKey key = keyGen.generateKey(); 
           
         PBEKeySpec keySpec = new PBEKeySpec("randomkey^(^&*^%$".toCharArray());  
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");  
         SecretKey key = keyFactory.generateSecret(keySpec);  
           
-        /* 
-         *  �����ṩ����Ϣ��֤�롱��Message Authentication Code��MAC���㷨�Ĺ��ܡ� 
-         *  MAC ����������Կ�ṩһ�ַ�ʽ������ڲ��ɿ������Ͻ��д����洢����Ϣ�������ԡ� 
-         *  ͨ������Ϣ��֤���ڹ���������Կ������������֮��ʹ�ã�����֤������֮�䴫�����Ϣ�� 
-         *  ���ڼ��ܹ�ϣ����� MAC ����Ҳ���� HMAC��������ܹ�����Կ�� 
-         *  HMAC ���������κμ��ܹ�ϣ������ MD5 �� SHA-1�� 
-         */  
+        
         Mac mac = Mac.getInstance("HmacSHA1");  
-        //�������ֶ�����  
+  
 //      Mac mac = Mac.getInstance("HmacSHA256");  
 //      Mac mac = Mac.getInstance("HmacSHA384");  
 //      Mac mac = Mac.getInstance("HmacSHA512");  
@@ -66,25 +57,21 @@ public class SHA {
     }  
       
     /** 
-     * SHA1����  ʹ����ϢժҪMessageDigest ���� 
+     * SHA1
      * @throws Exception  
      */  
     public static String encodeBySHA(String str) throws Exception{  
         MessageDigest sha1;  
         sha1 = MessageDigest.getInstance("SHA1");  
-        //�������ֲ�����  
+        
 //      sha1 = MessageDigest.getInstance("SHA256");  
 //      sha1 = MessageDigest.getInstance("SHA384");  
 //      sha1 = MessageDigest.getInstance("SHA512");  
           
-        sha1.update(str.getBytes()); //�ȸ���ժҪ  
-        byte[] digest = sha1.digest(); //��ͨ��ִ���������֮������ղ�����ɹ�ϣ���㡣�ڵ��ô˷���֮��ժҪ�����á�  
+        sha1.update(str.getBytes());   
+        byte[] digest = sha1.digest(); 
           
-        /* 
-         * ʹ��ָ���� byte �����ժҪ���������£�Ȼ�����ժҪ���㡣 
-         * Ҳ����˵���˷������ȵ��� update(input)�� 
-         * �� update �������� input ���飬Ȼ����� digest()�� 
-         */  
+        
 //      byte[] digest = sha1.digest(str.getBytes());  
           
         String hex = toHex(digest);  
@@ -93,12 +80,11 @@ public class SHA {
     }  
       
     /** 
-     * �ļ����ժҪ 
      * @throws Exception 
      */  
-    public static void shaFile() throws Exception {  
+    public static void shaFile(String filePath) throws Exception {  
         MessageDigest messageDigest = MessageDigest.getInstance("SHA1");  
-        DigestOutputStream dos = new DigestOutputStream(new FileOutputStream(new File("abc.txt")), messageDigest);  
+        DigestOutputStream dos = new DigestOutputStream(new FileOutputStream(new File(filePath)), messageDigest);  
         dos.write("�л����񡭡�&������f*��214��admin*".getBytes());  
         dos.close();  
         byte[] digest = messageDigest.digest();  
@@ -112,12 +98,12 @@ public class SHA {
         }  
         dis.close();  
         byte[] digest2 = messageDigest.digest();  
-        //������ȡ��ϣ������ļ������ˣ� ��ʱ��ժҪ ���� д��ʱ�� һ��  
+
         System.out.println("ʹ�������ļ������ļ���ժҪΪ:" + toHex(digest2));  
     }  
       
     /** 
-     * sha1 ժҪת16���� 
+     * sha1
      * @param digest 
      * @return 
      */  
@@ -127,10 +113,10 @@ public class SHA {
           
         String out = null;  
         for (int i = 0; i < len; i++) {  
-//          out = Integer.toHexString(0xFF & digest[i] + 0xABCDEF); //������ salt  
-            out = Integer.toHexString(0xFF & digest[i]);//ԭʼ����  
+//          out = Integer.toHexString(0xFF & digest[i] + 0xABCDEF); 
+            out = Integer.toHexString(0xFF & digest[i]);
             if (out.length() == 1) {  
-                sb.append("0");//���Ϊ1λ ǰ�油��0  
+                sb.append("0"); 
             }  
             sb.append(out);  
         }  
