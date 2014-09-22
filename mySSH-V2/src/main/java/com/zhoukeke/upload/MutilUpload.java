@@ -1,17 +1,12 @@
 package com.zhoukeke.upload;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -22,10 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
+import org.apache.log4j.Logger;
 
 //5MB 
 @MultipartConfig(maxFileSize=1024*1024*5)
@@ -33,59 +25,53 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 @WebServlet(name = "com_toomao_web_upload_MutilUpload", urlPatterns = "/jqueryFileUpload")
 public class MutilUpload extends HttpServlet {
 	
-	private static boolean isInit = false;
-	private static String uploadPath = "";
+	private static Logger logger = Logger.getLogger(MutilUpload.class);
+	private static String uploadPath = "upload/image/";
+	private static String realPath = "";
+	private static String webPath = "";
 	
 	@SuppressWarnings("deprecation")
 	private void initPath(HttpServletRequest request)
 	{
 		try {
+			Date date=new Date();
+			DateFormat df=new SimpleDateFormat("yyyyMMdd");
+			webPath = uploadPath + df.format(date) + "/";
 			
-			uploadPath = getServletContext().getInitParameter("uploadPath");
-			if (uploadPath.trim().equals(""))
-				uploadPath = request.getRealPath("/upload");
+			realPath = request.getRealPath(webPath) + "/";
 			
-			File fileP = new File(uploadPath);
+			File fileP = new File(realPath);
 			if (!fileP.exists())
 				fileP.mkdirs();
-			
-			System.out.println("File will be saved to :" + uploadPath);
-			isInit = true;
+
 		} catch (Exception e) {
-			System.err.println("File Path init Error.");
+			logger.error("File Path init Error.");
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Post URL : /upload
-	 * 
-	 * Get URL : /upload?f=value
 	 * */
 	@Override
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		
-		if (!isInit)
-			initPath(request);
+		initPath(request);
 
 		if (request.getMethod().equalsIgnoreCase("post")) {
 			doPost(request, response);
 		} else if (request.getMethod().equalsIgnoreCase("get")) {
 			doGet(request, response);
 		} else if (request.getMethod().equalsIgnoreCase("options")) {
-			//System.out.println("ooptionss");
 			doOptions(request, response);
 		} else {
-			System.out.println("Some Error Here.");
-			System.out.println(request.getMethod());
+			logger.error("Method don't support:" + request.getMethod());
 		}
 	}
 	
 	
 	protected void doOptions(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		/*This is for ajax accoss domain.*/
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
 		response.setHeader("Access-Control-Max-Age", "30");
@@ -99,12 +85,14 @@ public class MutilUpload extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
 	{
-		/* This is for ajax accoss domain.*/
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
 		response.setHeader("Access-Control-Max-Age", "30");
 		PrintWriter out = response.getWriter();
 		try{
+			
+			String temp = "";
+			
 			Collection<Part> parts = request.getParts();
 			for (Part part : parts) {
 				if (isImage(part.getContentType()))
@@ -114,16 +102,18 @@ public class MutilUpload extends HttpServlet {
 					if (filename.length() > 0)
 					{
 						String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-						part.write(uploadPath + "/" + uuid + filename);
+						String tempName = uuid + filename.substring(filename.indexOf("."));
+						
+						part.write(realPath + tempName);
+						logger.info("A new file saved to:	" + realPath + tempName);
+						logger.info("You can visit it by:	" + webPath + tempName);
+						tempName = "\"" + webPath + tempName + "\"";
+						temp += temp.equals("")?(tempName):("," + tempName);
 					}
 				}
 			}
-			
-			
-			//ObjectMapper mapper = new ObjectMapper();
-			//StringWriter str = new StringWriter();
-			//mapper.writeValue(str, temp);
-			String resString = "{\"files\":[\"name1\",\"myname2\"]}";
+
+			String resString = "{\"files\":["+temp+"]}";
 			out.println(resString);
 
 		}
