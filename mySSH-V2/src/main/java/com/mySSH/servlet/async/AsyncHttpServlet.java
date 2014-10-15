@@ -20,7 +20,7 @@ public abstract class AsyncHttpServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		AsyncContext ctxAsyncContext = request.startAsync();
-		executorService.submit(new AsyncRequestBaseHander(ctxAsyncContext));
+		executorService.submit(new AsyncRequestBaseHandler(ctxAsyncContext));
 	}
 		
 	@Override
@@ -28,21 +28,27 @@ public abstract class AsyncHttpServlet extends HttpServlet {
 		executorService.shutdown();
 	}
 	
-	private class AsyncRequestBaseHander implements Runnable
+	private class AsyncRequestBaseHandler implements Runnable
 	{
 		private AsyncContext ctx;
 		
-		public AsyncRequestBaseHander(AsyncContext ctx) {
+		public AsyncRequestBaseHandler(AsyncContext ctx) {
 			this.ctx = ctx;
 		}
 
 		@Override
 		public void run() {
-			asyncService((HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse());
+			try {
+				asyncService((HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse());
+			} catch (ServletException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
 	
-	public abstract void asyncService(HttpServletRequest request, HttpServletResponse response);
+	public abstract void asyncService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 	
 }
