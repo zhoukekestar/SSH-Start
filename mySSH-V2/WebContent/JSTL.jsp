@@ -1,3 +1,4 @@
+<%@page import="com.alibaba.fastjson.JSON"%>
 <%@page import="org.apache.catalina.User"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -25,37 +26,44 @@ Map<String, Object> map = new HashMap<String, Object>();
 map.put("a", "map-a");
 map.put("b", "map-b");
 request.setAttribute("map", map);
+//---------------------------------------------------userList
+
+ArrayList<Map<?,?>> userList = new ArrayList<Map<?,?>>();
+Map<String, String> map1 = new HashMap<String, String>();
+map1.put("name", "zkk");
+map1.put("sex", "man");
+userList.add(map1);
+Map<String, String> map2 = new HashMap<String, String>();
+map2.put("name", "abc");
+map2.put("sex", "woman");
+userList.add(map2);
+request.setAttribute("userList", userList);
+
+//----------------------------------------------------complex
+ArrayList<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+
+Map<String,Object> objMap1 = new HashMap<String, Object>();
+objMap1.put("aa", "abc");
+objMap1.put("bb", userList);
+
+complexList.add(objMap1);
 
 
-//---------------------------------------------------usermap
-class User
-{
-	public String name = "";
-	public String sex = "";
-	
-	public User()
-	{
-		name = "unname";
-		sex = "unsex";
-	}
-	public User(String name, String sex)
-	{
-		this.name = name;
-		this.sex = sex;
-	}
-	
-	public String toString()
-	{
-		return "name: " + this.name + " sex: " + this.sex;
-	}
-}
-Map<String, User> userMap = new HashMap<String,User>();
-userMap.put("a", new User("zkk", "man"));
-userMap.put("b", new User("abc","woman"));
-request.setAttribute("userMap", userMap);
+Map<String,Object> objMap2 = new HashMap<String, Object>();
+objMap2.put("aa", "abcabc");
+objMap2.put("bb", userList);
 
+complexList.add(objMap2);
+request.setAttribute("complexList", complexList);
 
-//---------------------------------------------------
+//------------------------------------------------------
+String json = "{'name':'zkk','sex': 'man','age':3,'address': [{'name': '浙江', 'time': '小时候'}, {'name': '北京', 'time': '工作' }]}";
+json.replaceAll("'", "\"");
+System.out.print(json);
+Map<String, Object> fastJson = new HashMap<String, Object>();
+fastJson = JSON.parseObject(json);
+request.setAttribute("fastJson", fastJson);
+
 %>
 </head>
 <body>
@@ -93,9 +101,39 @@ request.setAttribute("userMap", userMap);
 		<td>${map.a }</td>
 		<td>${map.b }</td>
 	</tr>
+	<tr style=""><td>-----------userList</td></tr>
+	<c:forEach var="item" items="${userList }" varStatus="i">
 	<tr>
-		<td>${userMap.a }</td>
-		<td>${userMap.b }</td>
+		<td>${item.name}</td>
+		<td>${item.sex }</td>
+	</tr>
+	</c:forEach>
+	
+	<tr style=""><td>-----------complexList</td></tr>
+	<c:forEach var="item" items="${complexList }" varStatus="i">
+	<tr>
+		<td>${item.aa}</td>
+		<td>
+			<c:forEach var="item2" items="${item.bb}" >
+				name:${item2.name } sex:${item2.sex };
+			</c:forEach>
+		</td>
+	</tr>
+	<tr>
+	</tr>
+	</c:forEach>
+	<tr style=""><td>-----------fastJson</td></tr>
+	<tr>
+		<td>${fastJson.name }</td>;
+		<td>${fastJson.sex }</td>
+	</tr>
+	<tr>
+		<td>${fastJson.age }</td>;
+		<td>
+			<c:forEach var="item" items="${fastJson.address }">
+				${item.name } ${item.time } <br>
+			</c:forEach>
+		</td>
 	</tr>
 </table>
 
